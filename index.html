@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balance Sheet Analyzer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Balance Sheet Analyzer</h1>
+    <form id="uploadForm">
+      <input type="file" id="fileInput" accept=".csv" required />
+      <button type="submit">Upload CSV</button>
+    </form>
+    <button onclick="fetchAnalysis()">Get Analysis</button>
+    <div id="status"></div>
+    <div id="results"></div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
