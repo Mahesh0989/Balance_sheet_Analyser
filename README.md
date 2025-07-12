@@ -36,3 +36,40 @@ Tools: Git, GitHub, VS Code
 ├── package.json
 ├── server.js
 └── README.md
+
+
+Follow the steps below to run this project on your local machine.
+
+Prerequisites
+Node.js must be installed
+
+PostgreSQL must be installed and running
+
+Steps to Run
+Clone the repository
+Open terminal and run the following command:
+git clone https://github.com/your-username/balance-sheet-analyzer.git
+Then navigate into the project folder:
+cd balance-sheet-analyzer
+
+Install the dependencies
+Run this command to install the required packages:
+npm install
+
+Set up environment variables
+Create a file named .env in the root directory of the project.
+Add the following content to it, replacing the values with your PostgreSQL credentials:
+
+DB_USER=your_database_username
+DB_PASSWORD=your_database_password
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=your_database_name
+
+Start the server
+Run the following command in terminal:
+node server.js
+
+Open the application in your browser
+Go to:
+http://localhost:3000
