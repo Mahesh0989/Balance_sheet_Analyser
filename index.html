@@ -9,11 +9,13 @@
 <body>
   <div class="container">
     <h1>Balance Sheet Analyzer</h1>
+    <!-- Upload Form -->
     <form id="uploadForm">
       <input type="file" id="fileInput" accept=".csv" required />
       <button type="submit">Upload CSV</button>
     </form>
     <button onclick="fetchAnalysis()">Get Analysis</button>
+    <!-- Analysis Results -->
     <div id="status"></div>
     <div id="results"></div>
   </div>
