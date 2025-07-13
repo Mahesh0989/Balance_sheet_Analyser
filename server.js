@@ -1,27 +1,38 @@
+// Load environment variables from .env
+require('dotenv').config();
+
+// Import dependencies
 const express = require('express');
-const multer = require('multer');
-const csv = require('csv-parser');
-const fs = require('fs');
-const { Pool } = require('pg');
-const cors = require('cors');
+const multer = require('multer');         // For handling file uploads
+const csv = require('csv-parser');        // For parsing CSV files
+const fs = require('fs');                 // For file system operations
+const { Pool } = require('pg');           // PostgreSQL client
+const cors = require('cors');             // Enable CORS
 const path = require('path');
 
 const app = express();
 const port = 3000;
 
+// Configure multer to save uploaded files in the 'uploads' directory
 const upload = multer({ dest: 'uploads/' });
+
+// Enable CORS and JSON parsing
 app.use(cors());
 app.use(express.json());
+
+// Serve static frontend files from 'public' directory
 app.use(express.static('public'));
 
+// Setup PostgreSQL database connection
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
   database: 'balance_analyzer',
-  password: 'Mahesh@2003',
+  password: process.env.DB_PASSWORD //password hidden 
   port: 5432,
 });
 
+// Log errors to a local file for easier debugging
 function logError(error) {
   const errorLog = `[${new Date().toISOString()}] ${error.stack || error}\n`;
   fs.appendFile('error.log', errorLog, (err) => {
@@ -29,6 +40,7 @@ function logError(error) {
   });
 }
 
+// Validate a row to ensure it contains all necessary financial fields
 function isValidRow(row) {
   return (
     row.company &&
@@ -47,6 +59,7 @@ function isValidRow(row) {
   );
 }
 
+// Endpoint: Handle CSV upload and store valid financial data in the database
 app.post('/upload', upload.single('file'), (req, res) => {
   const results = [];
   try {
@@ -56,6 +69,8 @@ app.post('/upload', upload.single('file'), (req, res) => {
       .on('end', async () => {
         try {
           const validRows = results.filter(isValidRow);
+          
+          // Insert each valid row into the PostgreSQL database
           for (let row of validRows) {
             await pool.query(
               `INSERT INTO balance_sheets(
@@ -81,6 +96,8 @@ app.post('/upload', upload.single('file'), (req, res) => {
               ]
             );
           }
+
+          // Delete the uploaded file after processing
           fs.unlink(req.file.path, () => {});
           res.json({ message: 'File processed successfully' });
         } catch (err) {
@@ -94,9 +111,12 @@ app.post('/upload', upload.single('file'), (req, res) => {
   }
 });
 
+// Endpoint: Analyze financial data and return performance metrics
 app.get('/analyze', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM balance_sheets');
+
+    // Calculate financial ratios and assign performance label
     const analyzed = rows.map((data) => {
       const currentRatio = data.current_assets / data.current_liabilities;
       const quickRatio = (data.current_assets - data.inventory) / data.current_liabilities;
@@ -107,6 +127,7 @@ app.get('/analyze', async (req, res) => {
       const returnOnAssets = data.net_income / data.total_assets;
       const returnOnEquity = data.net_income / data.equity;
 
+      // Determine company performance based on ratio thresholds
       let performance = 'Average';
       if (
         currentRatio > 1.5 &&
@@ -149,6 +170,7 @@ app.get('/analyze', async (req, res) => {
   }
 });
 
+// Start the Express server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
